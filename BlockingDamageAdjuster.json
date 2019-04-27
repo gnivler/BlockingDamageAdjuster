@@ -7,5 +7,6 @@
     "mace2h":   0,
     "spear":    0,
     "halberd":  0,
-    "shield":   0
+    "shield":   0,
+    "enableDebug": false
 }

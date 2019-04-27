@@ -4,13 +4,14 @@ using System.Reflection;
 using BepInEx;
 using Harmony;
 using UnityEngine;
+using static BlockingDamageAdjuster.Logger;
 
 namespace BlockingDamageAdjuster
 {
     [BepInPlugin("com.gnivler.BlockingDamageAdjuster", "BlockingDamageAdjuster", "1.1")]
     public class BlockingDamageAdjuster : BaseUnityPlugin
     {
-        private static Settings modSettings = new Settings();
+        internal static Settings modSettings = new Settings();
 
         public class Settings
         {
@@ -23,14 +24,18 @@ namespace BlockingDamageAdjuster
             public float halberd = 0f;
             public float spear = 0f;
             public float shield = 0f;
+            public bool enableDebug = false;
         }
 
         public void Awake()
         {
+            var harmony = HarmonyInstance.Create("com.gnivler.BlockingDamageAdjuster");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
             try
             {
                 using (StreamReader reader = new StreamReader(
-                    @"BepInEx\plugins\BlockingDamageAdjuster\BlockingDamageAdjuster.json"))
+                    Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName +
+                    "\\BlockingDamageAdjuster.json"))
                 {
                     var json = reader.ReadToEnd();
                     modSettings = JsonUtility.FromJson<Settings>(json);
@@ -38,18 +43,17 @@ namespace BlockingDamageAdjuster
             }
             catch (Exception e)
             {
-                //FileLog.Log(e.Message);
+                Error(e);
             }
 
-            var harmony = HarmonyInstance.Create("com.gnivler.BlockingDamageAdjuster");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            LogDebug($"{DateTime.Now.ToShortTimeString()} BlockingDamageAdjuster Starting up");
         }
 
         [HarmonyPatch(typeof(Character), "ReceiveBlock", MethodType.Normal)]
         [HarmonyPatch(new[]
         {
-            typeof(MonoBehaviour),
-            typeof(float),
+            typeof(Weapon),
+            typeof(DamageList),
             typeof(Vector3),
             typeof(float),
             typeof(float),
@@ -58,16 +62,21 @@ namespace BlockingDamageAdjuster
         })]
         public class ReceiveBlockPatch
         {
-            public static void Prefix(Character __instance, Vector3 _hitDir, float _damage, Character _dealerChar)
+            public static void Postfix(
+                Character __instance,
+                Vector3 _hitDir,
+                DamageList _damage,
+                Character _dealerChar)
             {
+                var character = __instance;
                 var blockDamageModifier = 0f;
-                if (__instance.ShieldEquipped)
+                if (character.ShieldEquipped)
                 {
                     blockDamageModifier = modSettings.shield;
                 }
                 else
                 {
-                    switch (__instance.CurrentWeapon.Type)
+                    switch (character.CurrentWeapon.Type)
                     {
                         case (Weapon.WeaponType.Sword_1H):
                             blockDamageModifier = modSettings.sword1h;
@@ -96,7 +105,7 @@ namespace BlockingDamageAdjuster
                     }
                 }
 
-                __instance.VitalityHit(_dealerChar, _damage * blockDamageModifier, _hitDir);
+                character.VitalityHit(_dealerChar, _damage.TotalDamage * blockDamageModifier, _hitDir);
             }
         }
     }
