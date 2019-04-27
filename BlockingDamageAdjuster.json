@@ -1,10 +1,11 @@
 {
-    "axe1h":    1,
-    "axe2h":    1,
-    "sword1h":  1,
-    "sword2h":  1,
-    "mace1h":   1,
-    "mace2h":   1,
-    "halberd":  0.1,
-    "shield":   1
+    "axe1h":    0,
+    "axe2h":    0,
+    "sword1h":  0,
+    "sword2h":  0,
+    "mace1h":   0,
+    "mace2h":   0,
+    "spear":    0,
+    "halberd":  0,
+    "shield":   0
 }

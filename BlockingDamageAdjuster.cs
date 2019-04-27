@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BlockingDamageAdjuster
 {
-    [BepInPlugin("com.gnivler.BlockingDamageAdjuster", "BlockingDamageAdjuster", "1.0")]
+    [BepInPlugin("com.gnivler.BlockingDamageAdjuster", "BlockingDamageAdjuster", "1.1")]
     public class BlockingDamageAdjuster : BaseUnityPlugin
     {
         private static Settings modSettings = new Settings();
@@ -21,6 +21,7 @@ namespace BlockingDamageAdjuster
             public float mace1h = 0f;
             public float mace2h = 0f;
             public float halberd = 0f;
+            public float spear = 0f;
             public float shield = 0f;
         }
 
@@ -85,6 +86,9 @@ namespace BlockingDamageAdjuster
                             break;
                         case (Weapon.WeaponType.Mace_2H):
                             blockDamageModifier = modSettings.mace2h;
+                            break;
+                        case (Weapon.WeaponType.Spear_2H):
+                            blockDamageModifier = modSettings.spear;
                             break;
                         case (Weapon.WeaponType.Halberd_2H):
                             blockDamageModifier = modSettings.halberd;
