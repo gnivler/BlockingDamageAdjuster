@@ -18,22 +18,20 @@ namespace BlockingDamageAdjuster
             public float axe2h = 0f;
             public float sword1h = 0f;
             public float sword2h = 0f;
-            public float mace1h = 1f;
-            public float mace2h = 1f;
+            public float mace1h = 0f;
+            public float mace2h = 0f;
             public float halberd = 0f;
             public float shield = 0f;
         }
 
         public void Awake()
         {
-            //FileLog.Log("BDA Startup");
             try
             {
                 using (StreamReader reader = new StreamReader(
                     @"BepInEx\plugins\BlockingDamageAdjuster\BlockingDamageAdjuster.json"))
                 {
                     var json = reader.ReadToEnd();
-                    //FileLog.Log(json);
                     modSettings = JsonUtility.FromJson<Settings>(json);
                 }
             }
@@ -41,8 +39,6 @@ namespace BlockingDamageAdjuster
             {
                 //FileLog.Log(e.Message);
             }
-
-            //FileLog.Log("halberd " + modSettings.halberd);
 
             var harmony = HarmonyInstance.Create("com.gnivler.BlockingDamageAdjuster");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -63,7 +59,6 @@ namespace BlockingDamageAdjuster
         {
             public static void Prefix(Character __instance, Vector3 _hitDir, float _damage, Character _dealerChar)
             {
-                //FileLog.Log(modSettings.axe1h.ToString());
                 var blockDamageModifier = 0f;
                 if (__instance.ShieldEquipped)
                 {
